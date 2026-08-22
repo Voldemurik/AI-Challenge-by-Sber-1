@@ -1,0 +1,527 @@
+<!doctype html><html><head><meta charset='utf-8'><title>Запуск проекта и GitHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#F2F4F0; --surface:#FBFCFA; --surface-2:#E9EDE7;
+  --ink:#131A16; --ink-2:#3A453E; --muted:#5E6A62;
+  --line:#D6DDD4; --line-strong:#B9C3B7;
+  --accent:#0E6B57; --accent-ink:#0A5244; --accent-soft:#DCEAE3;
+  --warn:#8A5A0B; --warn-soft:#F2E8D4;
+  --crit:#9B3A2E; --crit-soft:#F4E1DC;
+  --good:#2F6E4A;
+  --shadow:0 1px 2px rgba(19,26,22,.05), 0 8px 24px -18px rgba(19,26,22,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1310; --surface:#141C18; --surface-2:#1B241F;
+    --ink:#E5EDE7; --ink-2:#C0CCC4; --muted:#8E9C94;
+    --line:#25302A; --line-strong:#374339;
+    --accent:#54C3A4; --accent-ink:#7FD9BE; --accent-soft:#15302A;
+    --warn:#D9A64E; --warn-soft:#2C2415;
+    --crit:#E28374; --crit-soft:#31201C;
+    --good:#6DBE8E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1310; --surface:#141C18; --surface-2:#1B241F;
+  --ink:#E5EDE7; --ink-2:#C0CCC4; --muted:#8E9C94;
+  --line:#25302A; --line-strong:#374339;
+  --accent:#54C3A4; --accent-ink:#7FD9BE; --accent-soft:#15302A;
+  --warn:#D9A64E; --warn-soft:#2C2415;
+  --crit:#E28374; --crit-soft:#31201C;
+  --good:#6DBE8E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  font-size:16.5px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1060px; margin:0 auto; padding:0 24px 96px;}
+.col{max-width:70ch;}
+
+h1,h2,h3{font-family:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif; text-wrap:balance; margin:0;}
+h1{font-weight:800; font-size:clamp(2.1rem,5.2vw,3.3rem); line-height:1.04; letter-spacing:-.02em;}
+h2{font-weight:800; font-size:clamp(1.35rem,2.6vw,1.78rem); line-height:1.15; letter-spacing:-.015em;}
+h3{font-weight:600; font-size:1.06rem; line-height:1.3; letter-spacing:-.005em;}
+p{margin:0}
+a{color:var(--accent-ink)}
+
+.eyebrow{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent); font-weight:600;
+}
+
+/* ---------- header ---------- */
+.masthead{border-bottom:1px solid var(--line); background:var(--surface);}
+.masthead .wrap{display:flex; flex-direction:column; gap:18px; padding-top:56px; padding-bottom:34px;}
+.lede{font-size:1.1rem; color:var(--ink-2); max-width:62ch;}
+
+.spec{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:3px; overflow:hidden; margin-top:8px;
+}
+.spec > div{background:var(--surface); padding:12px 14px;}
+.spec dt{
+  font-family:"IBM Plex Mono", monospace; font-size:.66rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 3px;
+}
+.spec dd{
+  margin:0; font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;
+  font-size:1.15rem; font-weight:600; color:var(--ink); line-height:1.2;
+}
+.spec dd small{display:block; font-family:"IBM Plex Sans",sans-serif; font-size:.76rem; font-weight:400; color:var(--muted); letter-spacing:0;}
+
+/* ---------- sections ---------- */
+section{padding-top:56px;}
+.sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px;}
+.sec-head .num{
+  font-family:"IBM Plex Mono", monospace; font-size:.8rem; font-weight:600;
+  color:var(--accent); flex:none; padding-top:2px;
+}
+.stack{display:flex; flex-direction:column; gap:16px;}
+.stack-lg{display:flex; flex-direction:column; gap:26px;}
+
+/* ---------- callouts ---------- */
+.note{
+  border:1px solid var(--line); border-left:3px solid var(--accent);
+  background:var(--surface); border-radius:0 4px 4px 0; padding:16px 18px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.note.warn{border-left-color:var(--warn)}
+.note.crit{border-left-color:var(--crit)}
+.note .tag{
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; font-weight:600; color:var(--accent);
+}
+.note.warn .tag{color:var(--warn)} .note.crit .tag{color:var(--crit)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface);}
+table{border-collapse:collapse; width:100%; font-size:.9rem;}
+th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:top;}
+td.wrap-cell{white-space:normal; min-width:300px; max-width:430px;}
+thead th{
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); font-weight:600; background:var(--surface-2);
+}
+tbody tr:last-child td{border-bottom:none}
+td.num, th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+td code, .mono{font-family:"IBM Plex Mono",monospace; font-size:.86em;}
+tr.hl td{background:var(--accent-soft); font-weight:600;}
+.caption{font-size:.82rem; color:var(--muted); margin-top:8px;}
+
+/* ---------- chart ---------- */
+.chart{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:20px 22px 16px;}
+.chart-title{font-weight:600; font-size:.95rem; margin-bottom:4px;}
+.chart-sub{font-size:.82rem; color:var(--muted); margin-bottom:18px;}
+.bars{display:flex; flex-direction:column; gap:10px;}
+.bar-row{display:grid; grid-template-columns:minmax(140px,190px) 1fr; gap:14px; align-items:center;}
+.bar-label{font-size:.85rem; color:var(--ink-2); text-align:right; line-height:1.25;}
+.bar-track{display:flex; align-items:center; gap:10px;}
+.bar-fill{
+  height:14px; border-radius:0 4px 4px 0; background:var(--accent); opacity:.42;
+  transition:opacity .15s ease;
+}
+.bar-row:hover .bar-fill{opacity:.85}
+.bar-row.best .bar-fill{opacity:1}
+.bar-val{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:.84rem; font-weight:600; color:var(--ink); flex:none;
+}
+.bar-val span{color:var(--muted); font-weight:400;}
+.axis{
+  display:grid; grid-template-columns:minmax(140px,190px) 1fr; gap:14px;
+  margin-top:12px; font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--muted);
+}
+.axis-scale{border-top:1px solid var(--line-strong); padding-top:5px; display:flex; justify-content:space-between;}
+.axis-unit{text-align:right; padding-top:5px;}
+
+/* ---------- cards ---------- */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:14px;}
+.card{border:1px solid var(--line); background:var(--surface); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:9px;}
+.card h3{color:var(--ink)}
+.card p{font-size:.9rem; color:var(--ink-2)}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; align-self:flex-start;
+  font-family:"IBM Plex Mono",monospace; font-size:.67rem; letter-spacing:.1em; text-transform:uppercase;
+  font-weight:600; padding:3px 8px; border-radius:3px;
+  background:var(--accent-soft); color:var(--accent-ink);
+}
+.chip.warn{background:var(--warn-soft); color:var(--warn)}
+.chip.crit{background:var(--crit-soft); color:var(--crit)}
+
+/* ---------- timeline ---------- */
+.tl{display:flex; flex-direction:column; gap:0; border-left:2px solid var(--line-strong); margin-left:8px;}
+.tl-item{position:relative; padding:0 0 24px 26px;}
+.tl-item:last-child{padding-bottom:0}
+.tl-item::before{
+  content:""; position:absolute; left:-7px; top:7px; width:12px; height:12px;
+  border-radius:50%; background:var(--accent); border:2px solid var(--surface);
+}
+.tl-when{
+  font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--accent); font-weight:600;
+}
+.tl-item h3{margin:2px 0 4px}
+.tl-item p{font-size:.92rem; color:var(--ink-2)}
+
+/* ---------- lists ---------- */
+ul.tight{margin:0; padding-left:1.15em; display:flex; flex-direction:column; gap:7px;}
+ul.tight li{padding-left:2px}
+ul.tight li::marker{color:var(--accent)}
+
+.kv{display:flex; flex-direction:column; gap:10px;}
+.kv-row{display:grid; grid-template-columns:minmax(120px,170px) 1fr; gap:16px; align-items:start; padding-bottom:10px; border-bottom:1px solid var(--line);}
+.kv-row:last-child{border-bottom:none; padding-bottom:0}
+.kv-k{font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--muted); padding-top:2px;}
+.kv-v{font-size:.93rem; color:var(--ink-2)}
+
+pre{
+  margin:0; overflow-x:auto; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:4px; padding:14px 16px; font-family:"IBM Plex Mono",monospace;
+  font-size:.83rem; line-height:1.55; color:var(--ink);
+}
+.formula{
+  background:var(--surface); border:1px solid var(--line); border-radius:4px;
+  padding:18px 20px; font-family:"IBM Plex Mono",monospace; font-size:.92rem;
+  line-height:1.9; overflow-x:auto; color:var(--ink);
+}
+.formula b{color:var(--accent-ink); font-weight:600}
+
+footer{margin-top:64px; padding-top:20px; border-top:1px solid var(--line); font-size:.82rem; color:var(--muted);}
+footer a{color:var(--muted); text-decoration:underline; text-underline-offset:2px;}
+footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:column; gap:4px;}
+
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
+@media (max-width:620px){
+  .bar-row{grid-template-columns:1fr; gap:4px}
+  .bar-label{text-align:left}
+  .kv-row{grid-template-columns:1fr; gap:2px}
+}
+</style>
+<style>
+.steps{counter-reset:step; display:flex; flex-direction:column; gap:14px;}
+.step{
+  position:relative; padding:16px 18px 16px 56px; border:1px solid var(--line);
+  background:var(--surface); border-radius:4px;
+}
+.step::before{
+  counter-increment:step; content:counter(step);
+  position:absolute; left:16px; top:16px; width:26px; height:26px; border-radius:50%;
+  background:var(--accent-soft); color:var(--accent-ink);
+  font-family:"IBM Plex Mono",monospace; font-size:.78rem; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+}
+.step h3{margin-bottom:6px}
+.step p{font-size:.92rem; color:var(--ink-2)}
+.step + .step{margin-top:0}
+.step .hint{font-size:.85rem; color:var(--muted); margin-top:6px}
+.cmd{
+  display:block; margin-top:9px; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:4px; padding:10px 13px; font-family:"IBM Plex Mono",monospace;
+  font-size:.82rem; line-height:1.6; color:var(--ink); overflow-x:auto; white-space:pre;
+}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px;}
+.panel{border:1px solid var(--line); background:var(--surface); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:10px;}
+.panel h3{display:flex; align-items:center; gap:9px}
+.mark{
+  width:20px; height:20px; border-radius:4px; flex:none; display:flex; align-items:center;
+  justify-content:center; font-family:"IBM Plex Mono",monospace; font-size:.8rem; font-weight:700;
+}
+.mark.yes{background:var(--accent-soft); color:var(--accent-ink)}
+.mark.no{background:var(--crit-soft); color:var(--crit)}
+.panel ul{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:6px; font-size:.9rem; color:var(--ink-2)}
+.panel ul li::marker{color:var(--muted)}
+.check{display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:4px; background:var(--surface); overflow:hidden;}
+.check-row{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:start; padding:13px 16px; border-bottom:1px solid var(--line);}
+.check-row:last-child{border-bottom:none}
+.box{width:15px; height:15px; border:1.5px solid var(--line-strong); border-radius:3px; margin-top:4px;}
+.check-row .what{font-size:.93rem}
+.check-row .what small{display:block; color:var(--muted); font-size:.82rem; margin-top:2px}
+.when{font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); white-space:nowrap; padding-top:3px;}
+.when.later{color:var(--muted)}
+</style></head><body>
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Стоимость аренды квартиры · AI Challenge 2026</div>
+    <h1>Запуск проекта и работа через GitHub</h1>
+    <p class="lede">Что установить, как за пятнадцать минут получить работающий проект, как загрузить его в <a href="https://github.com/Voldemurik/AI-Challenge-by-Sber-1">AI-Challenge-by-Sber-1</a> и как мы будем вести репозиторий дальше вдвоём.</p>
+    <dl class="spec">
+      <div><dt>Система</dt><dd>Windows<small>инструкции под неё</small></dd></div>
+      <div><dt>Среда</dt><dd>PyCharm<small>у вас уже стоит</small></dd></div>
+      <div><dt>Библиотек</dt><dd>3<small>обязательных</small></dd></div>
+      <div><dt>Настройка</dt><dd>~30 мин<small>один раз</small></dd></div>
+      <div><dt>Репозиторий</dt><dd>public<small>Sber-1</small></dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>Что я могу с вашим репозиторием, а что нет</h2></div>
+  <div class="col stack" style="margin-bottom:18px">
+    <p>Отвечаю прямо, потому что от этого зависит вся дальнейшая схема работы: <strong>вести репозиторий я могу, а отправлять в него коммиты сам — нет.</strong></p>
+  </div>
+  <div class="two">
+    <div class="panel">
+      <h3><span class="mark yes">✓</span>Могу</h3>
+      <ul>
+        <li>Писать и переписывать код, ноутбуки, README, документацию</li>
+        <li>Готовить изменения целиком — с текстом коммита, который останется только подтвердить</li>
+        <li>Читать ваш репозиторий напрямую — он публичный, так что актуальное состояние кода я вижу сам</li>
+        <li>Ревьюить ваши изменения, искать ошибки, предлагать структуру</li>
+        <li>Собирать релизы: обновлённые сабмиты, отчёты, графики</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3><span class="mark no">✕</span>Не могу</h3>
+      <ul>
+        <li>Делать <code class="mono">git push</code> от вашего имени</li>
+        <li>Создавать за вас ветки и pull request'ы на GitHub</li>
+        <li>Удалять или переименовывать что-либо в репозитории</li>
+      </ul>
+      <p style="font-size:.88rem; color:var(--muted)">Причина одна: всё это требует вашего токена доступа к GitHub. Чужие токены и пароли я в работу не беру — это правило, а не техническое ограничение, и обойти его нельзя.</p>
+    </div>
+  </div>
+  <div class="col stack" style="margin-top:18px">
+    <div class="note">
+      <span class="tag">Как это выглядит на практике</span>
+      <p>Разница между «я пушу» и «пушите вы» — примерно один клик. Я отдаю готовые файлы и текст коммита, вы нажимаете <strong>Commit and Push</strong> в PyCharm. Авторство коммитов при этом остаётся вашим, что для конкурсной работы даже правильнее.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Репозиторий публичный — что это значит</h2></div>
+  <div class="col stack">
+    <p>Адрес: <a href="https://github.com/Voldemurik/AI-Challenge-by-Sber-1"><code class="mono">github.com/Voldemurik/AI-Challenge-by-Sber-1</code></a>. Раз он открытый, я клонирую его сам и вижу актуальное состояние кода — спрашивать вас, что там сейчас лежит, больше не нужно.</p>
+    <div class="note warn">
+      <span class="tag">Одна оговорка</span>
+      <p>Правила соревнований иногда запрещают публиковать решения до конца этапа: открытый репозиторий формально доступен другим участникам. Спросите об этом поддержку вместе с вопросом про метрику. Если окажется, что нельзя, — в настройках репозитория есть переключатель <strong>Settings → Danger Zone → Change visibility</strong>, одна кнопка. Работать мы сможем и с приватным, просто вы будете класть файлы в папку проекта, как делали до сих пор.</p>
+    </div>
+    <p>Пока правила не проверены, есть промежуточный вариант: выложить структуру, код и README, а ноутбук с полным разбором и готовые сабмиты добавить после 15 сентября. Скажите, если хотите так — соберу отдельный архив.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Что установить</h2></div>
+  <div class="col stack" style="margin-bottom:18px">
+    <p>Судя по папкам <code class="mono">PycharmProjects</code> и <code class="mono">PythonProject</code> у вас на компьютере, первые два пункта уже закрыты — проверьте и переходите к третьему.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <h3>Python 3.10 или новее</h3>
+      <p>Проверить: откройте <strong>Пуск → cmd</strong> и выполните команду. Если версия ниже 3.10 или команда не найдена — скачайте с <a href="https://www.python.org/downloads/">python.org</a>.</p>
+      <code class="cmd">python --version</code>
+      <p class="hint">При установке обязательно поставьте галочку <strong>«Add python.exe to PATH»</strong> — без неё команда <code class="mono">python</code> не заработает в консоли.</p>
+    </div>
+    <div class="step">
+      <h3>PyCharm Community Edition</h3>
+      <p>Бесплатная версия, её достаточно. В ней уже встроены и Git, и поддержка Jupyter-ноутбуков, так что отдельные программы для этого не нужны. Скачать: <a href="https://www.jetbrains.com/pycharm/download/">jetbrains.com/pycharm</a>.</p>
+      <p class="hint">Если привычнее VS Code — тоже подойдёт, поставьте расширения Python и Jupyter.</p>
+    </div>
+    <div class="step">
+      <h3>Git for Windows</h3>
+      <p>Нужен, даже если работать через кнопки PyCharm: PyCharm вызывает его под капотом. Скачать: <a href="https://git-scm.com/download/win">git-scm.com</a>. Все настройки при установке оставляйте по умолчанию.</p>
+      <code class="cmd">git --version</code>
+    </div>
+    <div class="step">
+      <h3>Аккаунт на GitHub</h3>
+      <p>Регистрация на <a href="https://github.com/">github.com</a> — почта, имя пользователя, пароль. Включите двухфакторную аутентификацию, когда предложат: без неё GitHub со временем начнёт ограничивать аккаунт.</p>
+      <p class="hint">Имя пользователя стоит выбрать нейтральное — этот аккаунт вполне может пригодиться при поступлении и на первой работе.</p>
+    </div>
+    <div class="step">
+      <h3>Библиотеки Python</h3>
+      <p>Ставятся одной командой из файла <code class="mono">requirements.txt</code>, который уже лежит в архиве проекта. Как именно — в следующем разделе.</p>
+    </div>
+  </div>
+
+  <div class="stack" style="margin-top:26px">
+    <h3 class="col">Что именно ставится и зачем</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Библиотека</th><th>Зачем</th><th>Обязательна</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono">numpy</code></td><td class="wrap-cell">Матрицы и линейная алгебра. Вся наша модель — это одна функция <code class="mono">np.linalg.lstsq</code></td><td><span class="chip">да</span></td></tr>
+          <tr><td><code class="mono">pandas</code></td><td class="wrap-cell">Чтение CSV и работа с таблицами</td><td><span class="chip">да</span></td></tr>
+          <tr><td><code class="mono">scikit-learn</code></td><td class="wrap-cell">Кросс-валидация и метрики (RMSE, MAE, R²)</td><td><span class="chip">да</span></td></tr>
+          <tr><td><code class="mono">matplotlib</code></td><td class="wrap-cell">Графики в ноутбуке и в отчёте</td><td><span class="chip warn">для отчёта</span></td></tr>
+          <tr><td><code class="mono">jupyterlab</code></td><td class="wrap-cell">Запуск ноутбука. Если работаете в PyCharm — он открывает <code class="mono">.ipynb</code> сам, и это не нужно</td><td><span class="chip warn">по желанию</span></td></tr>
+          <tr><td><code class="mono">lightgbm</code></td><td class="wrap-cell">Градиентный бустинг. Нужен только чтобы показать в отчёте, что он проигрывает — но это сильный аргумент, и лучше его иметь</td><td><span class="chip warn">желательно</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Ни GPU, ни специального железа не требуется: данные весят 250 КБ, полная кросс-валидация считается за секунды на любом ноутбуке.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Первый запуск</h2></div>
+  <div class="col stack" style="margin-bottom:18px">
+    <p>Архив <code class="mono">AI-Challenge-by-Sber-1.zip</code> уже лежит в папке проекта. Внутри — содержимое репозитория: код, ноутбук, README, отчёты, <code class="mono">.gitignore</code> и оба сабмита. Файлов конкурса в архиве нет намеренно — их вы добавите на четвёртом шаге.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <h3>Распакуйте архив</h3>
+      <p>Не в папку конкурса, а туда, где вы держите проекты — например, в <code class="mono">C:\Users\...\PycharmProjects\</code>. Получится папка <code class="mono">AI-Challenge-by-Sber-1</code>, а внутри неё <code class="mono">rent-price</code> — рабочая папка этой задачи.</p>
+      <p class="hint">Задача аренды лежит в подпапке специально: когда возьмётесь за две другие темы квалификации, они станут соседними папками в том же репозитории.</p>
+    </div>
+    <div class="step">
+      <h3>Откройте в PyCharm папку <code class="mono">rent-price</code></h3>
+      <p><strong>File → Open</strong> и выберите именно <code class="mono">rent-price</code>, а не корень репозитория — тогда PyCharm правильно подхватит пути к данным и модулям.</p>
+    </div>
+    <div class="step">
+      <h3>Создайте виртуальное окружение</h3>
+      <p>PyCharm обычно предлагает это сам во всплывающем окне — согласитесь. Если не предложил: <strong>File → Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter → Virtualenv</strong>, тип <code class="mono">.venv</code>.</p>
+      <p class="hint">Виртуальное окружение — отдельная папка с библиотеками только для этого проекта. Нужна, чтобы установка чего-нибудь для одного проекта не ломала другой.</p>
+    </div>
+    <div class="step">
+      <h3>Положите данные конкурса</h3>
+      <p>Скопируйте <code class="mono">train</code>, <code class="mono">test</code> и <code class="mono">sample_submission</code> из папки конкурса в <code class="mono">rent-price/data/</code>. Переименовывать не нужно — код читает и с расширением <code class="mono">.csv</code>, и без него.</p>
+    </div>
+    <div class="step">
+      <h3>Установите библиотеки</h3>
+      <p>Откройте в PyCharm вкладку <strong>Terminal</strong> внизу и выполните:</p>
+      <code class="cmd">pip install -r requirements.txt</code>
+      <p class="hint">Займёт пару минут. Если <code class="mono">pip</code> ругается на права — добавьте <code class="mono">--user</code>.</p>
+    </div>
+    <div class="step">
+      <h3>Проверьте, что всё работает</h3>
+      <p>В том же терминале:</p>
+      <code class="cmd">python scripts/make_submission.py</code>
+      <p>Скрипт напечатает проверку данных, таблицу кросс-валидации и пересоберёт два файла в <code class="mono">submissions/</code>. Если увидели строку <code class="mono">deg 3, mean · RMSE 1266.459</code> — всё встало правильно.</p>
+    </div>
+    <div class="step">
+      <h3>Откройте ноутбук</h3>
+      <p>Файл <code class="mono">notebooks/01_solution.ipynb</code> — двойной клик в PyCharm. Там весь разбор с графиками. Запустить все ячейки: <strong>Run All</strong> вверху.</p>
+      <p class="hint">Если Python ставить не хочется — те же материалы лежат в <code class="mono">reports/</code> обычными HTML-файлами, они открываются в браузере.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Загрузить проект в репозиторий</h2></div>
+  <div class="col stack" style="margin-bottom:18px">
+    <p>Репозиторий уже создан и пока содержит только README. Архив <code class="mono">AI-Challenge-by-Sber-1.zip</code> лежит в папке проекта — внутри ровно те 18 файлов, которые должны туда попасть. Данных конкурса в архиве намеренно нет.</p>
+    <p>Есть два пути. Первый — быстрее, второй — правильнее на будущее.</p>
+  </div>
+
+  <div class="two">
+    <div class="panel">
+      <h3>Через сайт GitHub — 2 минуты</h3>
+      <p style="font-size:.9rem; color:var(--ink-2)">Ничего устанавливать не нужно, годится прямо сейчас.</p>
+      <ul>
+        <li>Распакуйте архив</li>
+        <li>Откройте репозиторий на github.com</li>
+        <li><strong>Add file → Upload files</strong></li>
+        <li>Перетащите в окно браузера <em>содержимое</em> папки <code class="mono">AI-Challenge-by-Sber-1</code> — сами файлы и папку <code class="mono">rent-price</code>, а не папку целиком</li>
+        <li>Внизу впишите описание коммита и нажмите <strong>Commit changes</strong></li>
+      </ul>
+      <p style="font-size:.85rem; color:var(--muted)">На вопрос о замене <code class="mono">README.md</code> отвечайте согласием — новый содержательнее.</p>
+    </div>
+    <div class="panel">
+      <h3>Через PyCharm — правильный путь</h3>
+      <p style="font-size:.9rem; color:var(--ink-2)">Так вы будете работать дальше, поэтому настроить стоит один раз.</p>
+      <ul>
+        <li><strong>File → Project from Version Control</strong>, вставьте адрес репозитория</li>
+        <li>Скопируйте в открывшуюся папку содержимое архива, поверх существующего</li>
+        <li>Положите <code class="mono">train</code>, <code class="mono">test</code>, <code class="mono">sample_submission</code> в <code class="mono">rent-price/data/</code></li>
+        <li>Вкладка <strong>Commit</strong> слева — посмотрите список изменений</li>
+        <li><strong>Ctrl+K</strong> — описание коммита, <strong>Ctrl+Shift+K</strong> — отправить</li>
+      </ul>
+      <p style="font-size:.85rem; color:var(--muted)">Аккаунт GitHub привязывается один раз: <strong>Settings → Version Control → GitHub → Log In via GitHub</strong>.</p>
+    </div>
+  </div>
+
+  <div class="col stack" style="margin-top:18px">
+    <div class="note">
+      <span class="tag">Текст первого коммита</span>
+      <p><code class="mono">Решение задачи «Стоимость аренды квартиры»: модель, ноутбук, отчёты</code></p>
+    </div>
+    <div class="note crit">
+      <span class="tag">Что не должно попасть в репозиторий</span>
+      <p>Файлы <code class="mono">train</code>, <code class="mono">test</code>, <code class="mono">sample_submission</code> — они принадлежат организаторам. И папка <code class="mono">.venv</code> — она весит сотни мегабайт и восстанавливается одной командой. Оба случая закрыты файлом <code class="mono">.gitignore</code>, но при загрузке через сайт <code class="mono">.gitignore</code> не действует — там следите сами. Поэтому данных в архиве и нет.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">06</span><h2>Как мы работаем дальше</h2></div>
+  <div class="col">
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">Шаг 1 — вы</div>
+        <h3>Говорите, что нужно</h3>
+        <p>«Добавь взвешивание по районам», «перепиши README», «проверь, нет ли ошибки в подсчёте метрики», «метрика оказалась MAE — переделай сабмит».</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Шаг 2 — я</div>
+        <h3>Готовлю изменения</h3>
+        <p>Сначала клонирую репозиторий и смотрю, что там сейчас — раз он публичный, спрашивать вас не нужно. Потом пишу код, прогоняю кросс-валидацию, проверяю, что ничего не сломалось, и кладу готовые файлы в папку проекта вместе с текстом коммита.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Шаг 3 — вы</div>
+        <h3>Переносите и отправляете</h3>
+        <p>Копируете файлы в папку репозитория поверх старых, в PyCharm смотрите вкладку <strong>Commit</strong> — там видно построчно, что изменилось, — и жмёте <strong>Commit and Push</strong>. После этого я снова вижу актуальную версию.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Важно</div>
+        <h3>Смотрите на diff перед отправкой</h3>
+        <p>Это не формальность. Вкладка Commit показывает каждую изменённую строку — привычка их просматривать защищает от чужих ошибок, включая мои, и на защите вы будете понимать каждую строчку своего проекта.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">07</span><h2>Что делать по проекту дальше</h2></div>
+  <div class="stack">
+    <div class="check">
+      <div class="check-row"><span class="box"></span><span class="what">Дождаться ответа поддержки про метрику лидерборда<small>Заодно спросите, можно ли держать решение в открытом репозитории до конца этапа</small></span><span class="when">ждём</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Отправить сабмит<small><code class="mono">submission_rmse.csv</code> при RMSE или R², <code class="mono">submission_mae.csv</code> при MAE или MAPE. Пока метрика неизвестна — отправьте вариант под RMSE, он чаще используется</small></span><span class="when">сразу</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Сверить публичный результат с локальной кросс-валидацией<small>Если расходятся сильно — значит, метрика другая, и это само по себе подсказка</small></span><span class="when">сразу</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Загрузить проект в репозиторий<small>Раздел 05 — через сайт это две минуты, через PyCharm минут пятнадцать с настройкой</small></span><span class="when">сразу</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Прочитать ноутбук целиком и разобраться в каждом шаге<small>Это то, что вы будете защищать. Всё непонятное — спрашивайте, объясню подробнее</small></span><span class="when">до сдачи</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Добавить улучшения: взвешивание по σ района, усадку коэффициентов малых районов<small>Прирост будет небольшим — потолок близко, — но в отчёте это выглядит зрело</small></span><span class="when later">по желанию</span></div>
+      <div class="check-row"><span class="box"></span><span class="what">Взяться за две оставшиеся темы квалификации<small>Аренда фактически закрыта; до 15 сентября остаётся около трёх недель</small></span><span class="when later">дальше</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">08</span><h2>Если что-то пошло не так</h2></div>
+  <div class="stack">
+    <div class="tw">
+      <table>
+        <thead><tr><th>Сообщение об ошибке</th><th>Что случилось и что делать</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono">'python' is not recognized</code></td><td class="wrap-cell">Python не прописан в PATH. Переустановите его с галочкой «Add python.exe to PATH» или используйте команду <code class="mono">py</code> вместо <code class="mono">python</code></td></tr>
+          <tr><td><code class="mono">ModuleNotFoundError: No module named 'pandas'</code></td><td class="wrap-cell">Библиотеки поставлены не в то окружение. В PyCharm проверьте <strong>Settings → Python Interpreter</strong> — там должен быть интерпретатор из <code class="mono">.venv</code> вашего проекта, — и повторите <code class="mono">pip install -r requirements.txt</code></td></tr>
+          <tr><td><code class="mono">FileNotFoundError: Не найден файл 'train'</code></td><td class="wrap-cell">Файлы конкурса не лежат в <code class="mono">rent-price/data/</code>. Скопируйте туда <code class="mono">train</code>, <code class="mono">test</code> и <code class="mono">sample_submission</code> — расширения не нужны</td></tr>
+          <tr><td><code class="mono">fatal: not a git repository</code></td><td class="wrap-cell">Команда выполняется не в папке проекта. Перейдите в неё: <code class="mono">cd путь\к\AI-Challenge-by-Sber-1</code></td></tr>
+          <tr><td>PyCharm предлагает залить <code class="mono">.venv</code> или <code class="mono">data</code></td><td class="wrap-cell">Значит, <code class="mono">.gitignore</code> не подхватился — проверьте, что файл лежит в корне репозитория (рядом с верхним <code class="mono">README.md</code>) и называется именно так, с точкой в начале</td></tr>
+          <tr><td>Числа в кросс-валидации не совпали с README</td><td class="wrap-cell">Небольшое расхождение в третьем знаке — это разные версии библиотек, нормально. Большое — напишите мне, разберёмся</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Инструкция под Windows и PyCharm. Разбор самой задачи — в отдельном документе: <a href="https://claude.ai/code/artifact/3b112efd-37fe-46bc-9d92-632501d1d546">Стоимость аренды квартиры: разбор задачи и план работы</a>.</p>
+</footer>
+
+</div>
+</body></html>

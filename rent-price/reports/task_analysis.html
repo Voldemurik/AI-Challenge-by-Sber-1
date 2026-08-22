@@ -1,0 +1,506 @@
+<!doctype html><html><head><meta charset='utf-8'><title>Разбор задачи «Стоимость аренды квартиры»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#F2F4F0; --surface:#FBFCFA; --surface-2:#E9EDE7;
+  --ink:#131A16; --ink-2:#3A453E; --muted:#5E6A62;
+  --line:#D6DDD4; --line-strong:#B9C3B7;
+  --accent:#0E6B57; --accent-ink:#0A5244; --accent-soft:#DCEAE3;
+  --warn:#8A5A0B; --warn-soft:#F2E8D4;
+  --crit:#9B3A2E; --crit-soft:#F4E1DC;
+  --good:#2F6E4A;
+  --shadow:0 1px 2px rgba(19,26,22,.05), 0 8px 24px -18px rgba(19,26,22,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1310; --surface:#141C18; --surface-2:#1B241F;
+    --ink:#E5EDE7; --ink-2:#C0CCC4; --muted:#8E9C94;
+    --line:#25302A; --line-strong:#374339;
+    --accent:#54C3A4; --accent-ink:#7FD9BE; --accent-soft:#15302A;
+    --warn:#D9A64E; --warn-soft:#2C2415;
+    --crit:#E28374; --crit-soft:#31201C;
+    --good:#6DBE8E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1310; --surface:#141C18; --surface-2:#1B241F;
+  --ink:#E5EDE7; --ink-2:#C0CCC4; --muted:#8E9C94;
+  --line:#25302A; --line-strong:#374339;
+  --accent:#54C3A4; --accent-ink:#7FD9BE; --accent-soft:#15302A;
+  --warn:#D9A64E; --warn-soft:#2C2415;
+  --crit:#E28374; --crit-soft:#31201C;
+  --good:#6DBE8E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  font-size:16.5px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1060px; margin:0 auto; padding:0 24px 96px;}
+.col{max-width:70ch;}
+
+h1,h2,h3{font-family:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif; text-wrap:balance; margin:0;}
+h1{font-weight:800; font-size:clamp(2.1rem,5.2vw,3.3rem); line-height:1.04; letter-spacing:-.02em;}
+h2{font-weight:800; font-size:clamp(1.35rem,2.6vw,1.78rem); line-height:1.15; letter-spacing:-.015em;}
+h3{font-weight:600; font-size:1.06rem; line-height:1.3; letter-spacing:-.005em;}
+p{margin:0}
+a{color:var(--accent-ink)}
+
+.eyebrow{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent); font-weight:600;
+}
+
+/* ---------- header ---------- */
+.masthead{border-bottom:1px solid var(--line); background:var(--surface);}
+.masthead .wrap{display:flex; flex-direction:column; gap:18px; padding-top:56px; padding-bottom:34px;}
+.lede{font-size:1.1rem; color:var(--ink-2); max-width:62ch;}
+
+.spec{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:3px; overflow:hidden; margin-top:8px;
+}
+.spec > div{background:var(--surface); padding:12px 14px;}
+.spec dt{
+  font-family:"IBM Plex Mono", monospace; font-size:.66rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 3px;
+}
+.spec dd{
+  margin:0; font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;
+  font-size:1.15rem; font-weight:600; color:var(--ink); line-height:1.2;
+}
+.spec dd small{display:block; font-family:"IBM Plex Sans",sans-serif; font-size:.76rem; font-weight:400; color:var(--muted); letter-spacing:0;}
+
+/* ---------- sections ---------- */
+section{padding-top:56px;}
+.sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px;}
+.sec-head .num{
+  font-family:"IBM Plex Mono", monospace; font-size:.8rem; font-weight:600;
+  color:var(--accent); flex:none; padding-top:2px;
+}
+.stack{display:flex; flex-direction:column; gap:16px;}
+.stack-lg{display:flex; flex-direction:column; gap:26px;}
+
+/* ---------- callouts ---------- */
+.note{
+  border:1px solid var(--line); border-left:3px solid var(--accent);
+  background:var(--surface); border-radius:0 4px 4px 0; padding:16px 18px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.note.warn{border-left-color:var(--warn)}
+.note.crit{border-left-color:var(--crit)}
+.note .tag{
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; font-weight:600; color:var(--accent);
+}
+.note.warn .tag{color:var(--warn)} .note.crit .tag{color:var(--crit)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface);}
+table{border-collapse:collapse; width:100%; font-size:.9rem;}
+th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:top;}
+td.wrap-cell{white-space:normal; min-width:300px; max-width:430px;}
+thead th{
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); font-weight:600; background:var(--surface-2);
+}
+tbody tr:last-child td{border-bottom:none}
+td.num, th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+td code, .mono{font-family:"IBM Plex Mono",monospace; font-size:.86em;}
+tr.hl td{background:var(--accent-soft); font-weight:600;}
+.caption{font-size:.82rem; color:var(--muted); margin-top:8px;}
+
+/* ---------- chart ---------- */
+.chart{border:1px solid var(--line); border-radius:4px; background:var(--surface); padding:20px 22px 16px;}
+.chart-title{font-weight:600; font-size:.95rem; margin-bottom:4px;}
+.chart-sub{font-size:.82rem; color:var(--muted); margin-bottom:18px;}
+.bars{display:flex; flex-direction:column; gap:10px;}
+.bar-row{display:grid; grid-template-columns:minmax(140px,190px) 1fr; gap:14px; align-items:center;}
+.bar-label{font-size:.85rem; color:var(--ink-2); text-align:right; line-height:1.25;}
+.bar-track{display:flex; align-items:center; gap:10px;}
+.bar-fill{
+  height:14px; border-radius:0 4px 4px 0; background:var(--accent); opacity:.42;
+  transition:opacity .15s ease;
+}
+.bar-row:hover .bar-fill{opacity:.85}
+.bar-row.best .bar-fill{opacity:1}
+.bar-val{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:.84rem; font-weight:600; color:var(--ink); flex:none;
+}
+.bar-val span{color:var(--muted); font-weight:400;}
+.axis{
+  display:grid; grid-template-columns:minmax(140px,190px) 1fr; gap:14px;
+  margin-top:12px; font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--muted);
+}
+.axis-scale{border-top:1px solid var(--line-strong); padding-top:5px; display:flex; justify-content:space-between;}
+.axis-unit{text-align:right; padding-top:5px;}
+
+/* ---------- cards ---------- */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:14px;}
+.card{border:1px solid var(--line); background:var(--surface); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:9px;}
+.card h3{color:var(--ink)}
+.card p{font-size:.9rem; color:var(--ink-2)}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; align-self:flex-start;
+  font-family:"IBM Plex Mono",monospace; font-size:.67rem; letter-spacing:.1em; text-transform:uppercase;
+  font-weight:600; padding:3px 8px; border-radius:3px;
+  background:var(--accent-soft); color:var(--accent-ink);
+}
+.chip.warn{background:var(--warn-soft); color:var(--warn)}
+.chip.crit{background:var(--crit-soft); color:var(--crit)}
+
+/* ---------- timeline ---------- */
+.tl{display:flex; flex-direction:column; gap:0; border-left:2px solid var(--line-strong); margin-left:8px;}
+.tl-item{position:relative; padding:0 0 24px 26px;}
+.tl-item:last-child{padding-bottom:0}
+.tl-item::before{
+  content:""; position:absolute; left:-7px; top:7px; width:12px; height:12px;
+  border-radius:50%; background:var(--accent); border:2px solid var(--surface);
+}
+.tl-when{
+  font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--accent); font-weight:600;
+}
+.tl-item h3{margin:2px 0 4px}
+.tl-item p{font-size:.92rem; color:var(--ink-2)}
+
+/* ---------- lists ---------- */
+ul.tight{margin:0; padding-left:1.15em; display:flex; flex-direction:column; gap:7px;}
+ul.tight li{padding-left:2px}
+ul.tight li::marker{color:var(--accent)}
+
+.kv{display:flex; flex-direction:column; gap:10px;}
+.kv-row{display:grid; grid-template-columns:minmax(120px,170px) 1fr; gap:16px; align-items:start; padding-bottom:10px; border-bottom:1px solid var(--line);}
+.kv-row:last-child{border-bottom:none; padding-bottom:0}
+.kv-k{font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--muted); padding-top:2px;}
+.kv-v{font-size:.93rem; color:var(--ink-2)}
+
+pre{
+  margin:0; overflow-x:auto; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:4px; padding:14px 16px; font-family:"IBM Plex Mono",monospace;
+  font-size:.83rem; line-height:1.55; color:var(--ink);
+}
+.formula{
+  background:var(--surface); border:1px solid var(--line); border-radius:4px;
+  padding:18px 20px; font-family:"IBM Plex Mono",monospace; font-size:.92rem;
+  line-height:1.9; overflow-x:auto; color:var(--ink);
+}
+.formula b{color:var(--accent-ink); font-weight:600}
+
+footer{margin-top:64px; padding-top:20px; border-top:1px solid var(--line); font-size:.82rem; color:var(--muted);}
+footer a{color:var(--muted); text-decoration:underline; text-underline-offset:2px;}
+footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:column; gap:4px;}
+
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
+@media (max-width:620px){
+  .bar-row{grid-template-columns:1fr; gap:4px}
+  .bar-label{text-align:left}
+  .kv-row{grid-template-columns:1fr; gap:2px}
+}
+</style></head><body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">AI Challenge 2026 · квалификационный этап</div>
+    <h1>Стоимость аренды квартиры: разбор задачи и план работы</h1>
+    <p class="lede">Табличная регрессия на 7 000 строках и четырёх признаках. Разбор показал, что данные синтетические и порождены компактной мультипликативной формулой — поэтому здесь выигрывает не бустинг, а модель из полусотни коэффициентов.</p>
+    <dl class="spec">
+      <div><dt>train</dt><dd>7 000<small>строк, 4 признака</small></dd></div>
+      <div><dt>test</dt><dd>2 000<small>строк, id 7000–8999</small></dd></div>
+      <div><dt>Пропуски</dt><dd>0<small>и дублей тоже нет</small></dd></div>
+      <div><dt>Потолок R²</dt><dd>≈0.83<small>дальше только шум</small></dd></div>
+      <div><dt>Дедлайн</dt><dd>15.09<small>≈3,5 недели</small></dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>Что это за задача</h2></div>
+  <div class="col stack">
+    <p>Классическая табличная регрессия: по площади, району, этажу и удалённости от центра предсказать месячную арендную ставку. Никаких текстов, картинок и временных рядов — то есть весь результат решают качество признаков и выбор модели, а не вычислительные мощности.</p>
+    <p>Три файла в папке лежат <em>без расширений</em>, но внутри это обычный CSV с запятой-разделителем и заголовком. Достаточно переименовать в <code class="mono">train.csv</code>, <code class="mono">test.csv</code>, <code class="mono">sample_submission.csv</code> — или читать как есть через <code class="mono">pd.read_csv("train")</code>.</p>
+    <div class="note">
+      <span class="tag">Формат ответа</span>
+      <p><code class="mono">sample_submission</code> содержит две колонки — <code class="mono">id, rent_price</code> — и 2 000 строк, порядок id ровно совпадает с <code class="mono">test</code>. Во всех строках стоит одно и то же число <span class="mono">3193.2396185714283</span>: это в точности среднее <code class="mono">rent_price</code> по train. То есть организаторы дали константный baseline, и его R² на тесте будет примерно 0.</p>
+    </div>
+    <p>Конкурсный контекст: квалификация идёт с 1 июня по 15 сентября 2026, регистрация закрывается 15 сентября, финал — 12–26 октября. Треки: «Начинающие» (до 13 лет), «Школьники» (до 18), «Студенты» (до 25); призовой фонд 15,6 млн ₽, победители едут на AI Journey и попадают в подготовку к IOAI 2027.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Что в данных</h2></div>
+  <div class="stack">
+    <div class="tw">
+      <table>
+        <thead><tr><th>Поле</th><th>Тип</th><th class="num">Диапазон</th><th>Что важно знать</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono">id</code></td><td>int</td><td class="num">0 – 8999</td><td class="wrap-cell">Сквозной, train и test не пересекаются. С таргетом не коррелирует (r = −0.01) — утечки через порядок нет</td></tr>
+          <tr><td><code class="mono">area</code></td><td>float, м²</td><td class="num">18.0 – 260.0</td><td class="wrap-cell">Обрезана с двух сторон: ровно 18.0 встречается 132 раза, ровно 260.0 — 2 раза</td></tr>
+          <tr><td><code class="mono">district</code></td><td>категория</td><td class="num">10 значений</td><td class="wrap-cell">От <span class="mono">luxury_hills</span> (270 объектов) до <span class="mono">residential</span> (1 241). Единственный сильный предиктор</td></tr>
+          <tr><td><code class="mono">floor</code></td><td>int</td><td class="num">1 – 40</td><td class="wrap-cell">Влияние слабое, но реальное и монотонное: ~+5 % с 1-го этажа к 30-му</td></tr>
+          <tr><td><code class="mono">distance_to_center</code></td><td>float, км</td><td class="num">0.20 – 21.51</td><td class="wrap-cell">Убывание строго экспоненциальное: −3…−5 % цены на километр</td></tr>
+          <tr class="hl"><td><code class="mono">rent_price</code></td><td>float — таргет</td><td class="num">350 – 66 217</td><td class="wrap-cell">Skew 6.6. Снизу обрезан: ровно 350.00 встречается 36 раз</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Пропусков нет ни в train, ни в test. Полных дублей нет. Сдвига распределений между train и test нет: средние по всем трём числовым признакам совпадают до 1 %, доли районов расходятся максимум на 1 п.п. Валидацию можно строить обычным <span class="mono">KFold</span>, без ухищрений.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Как устроены данные — и почему это главное</h2></div>
+  <div class="col stack">
+    <p>Данные синтетические, и порождающую формулу видно почти целиком. Если взять логарифм цены и логарифм площади, зависимость становится линейной внутри каждого района:</p>
+  </div>
+  <div class="stack" style="margin-top:16px">
+    <div class="formula">
+      rent_price = <b>base</b>(district) × area<sup><b>α</b>(district)</sup> × e<sup>−<b>β</b>(district)·distance</sup> × (1 + <b>γ</b>·log floor) × <b>ε</b><br>
+      где ε — логнормальный шум, log ε ~ N(0, σ<sub>district</sub>), затем цена обрезается снизу на 350
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Район</th><th class="num">n</th><th class="num">Базовая цена<br>(при 66 м²)</th><th class="num">α — эластичность<br>по площади</th><th class="num">β — цена<br>за км от центра</th><th class="num">σ шума<br>(в логах)</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">university</span></td><td class="num">821</td><td class="num">2 352</td><td class="num">−0.27</td><td class="num">−2.8 %</td><td class="num">0.33</td></tr>
+          <tr><td><span class="mono">industrial</span></td><td class="num">595</td><td class="num">2 373</td><td class="num">+0.37</td><td class="num">−4.2 %</td><td class="num">0.51</td></tr>
+          <tr><td><span class="mono">residential</span></td><td class="num">1 241</td><td class="num">2 520</td><td class="num">+0.17</td><td class="num">−2.8 %</td><td class="num">0.37</td></tr>
+          <tr><td><span class="mono">suburb</span></td><td class="num">993</td><td class="num">2 575</td><td class="num">+0.04</td><td class="num">−2.8 %</td><td class="num">0.44</td></tr>
+          <tr><td><span class="mono">green_zone</span></td><td class="num">511</td><td class="num">2 930</td><td class="num">+0.13</td><td class="num">−3.2 %</td><td class="num">0.34</td></tr>
+          <tr><td><span class="mono">riverside</span></td><td class="num">583</td><td class="num">3 425</td><td class="num">+0.14</td><td class="num">−3.3 %</td><td class="num">0.32</td></tr>
+          <tr><td><span class="mono">central</span></td><td class="num">690</td><td class="num">3 553</td><td class="num">−0.00</td><td class="num">−4.4 %</td><td class="num">0.35</td></tr>
+          <tr><td><span class="mono">old_town</span></td><td class="num">528</td><td class="num">3 587</td><td class="num">+0.15</td><td class="num">−3.1 %</td><td class="num">0.33</td></tr>
+          <tr><td><span class="mono">business</span></td><td class="num">768</td><td class="num">3 681</td><td class="num">+0.09</td><td class="num">−4.8 %</td><td class="num">0.29</td></tr>
+          <tr class="hl"><td><span class="mono">luxury_hills</span></td><td class="num">270</td><td class="num">7 916</td><td class="num">+1.02</td><td class="num">−1.5 %</td><td class="num">0.23</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Коэффициенты лог-линейной регрессии по всем 7 000 строкам train. α = 1 означает «цена растёт пропорционально площади», α = 0 — «площадь вообще не влияет».</p>
+  </div>
+  <div class="col stack" style="margin-top:26px">
+    <h3>Три вывода, на которых строится всё решение</h3>
+    <div class="note">
+      <span class="tag">Вывод 1 — взаимодействие</span>
+      <p>Эластичность по площади радикально разная у разных районов. В <span class="mono">luxury_hills</span> α ≈ 1.0 — цена почти пропорциональна метражу. В <span class="mono">central</span> α ≈ 0.0 — цена от площади не зависит вообще (корреляция цены и площади внутри района: 0.03). В <span class="mono">university</span> α отрицательная: большие квартиры дешевле маленьких. Это физически бессмысленно и прямо выдаёт синтетику — но именно это взаимодействие <em>district × area</em> и даёт основной прирост качества. Модель без него упирается в R² ≈ 0.72.</p>
+    </div>
+    <div class="note warn">
+      <span class="tag">Вывод 2 — потолок</span>
+      <p>Разброс остатков в логарифмах σ ≈ 0.37, то есть мультипликативный шум порядка ±40 %. Он и определяет предел: <strong>выше R² ≈ 0.83 подняться нельзя никакой моделью</strong>. Разница между хорошим и отличным решением здесь — доли процента, а не разы. Планируйте время исходя из этого и не устраивайте недельный подбор гиперпараметров.</p>
+    </div>
+    <div class="note">
+      <span class="tag">Вывод 3 — обрезка</span>
+      <p>Таргет обрезан снизу на 350, площадь — на 18 и 260 м². Предсказания стоит клипать: <code class="mono">np.clip(pred, 350, None)</code>. Мелочь, но бесплатная.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Бенчмарк: что реально работает</h2></div>
+  <div class="col stack">
+    <p>Ниже — честная кросс-валидация 5 фолдов × 4 повтора на train. Один и тот же протокол для всех моделей, метрики считаются на исходной шкале цены.</p>
+  </div>
+  <div class="stack" style="margin-top:18px">
+    <div class="chart">
+      <div class="chart-title">RMSE на кросс-валидации — меньше значит лучше</div>
+      <div class="chart-sub">5-fold × 4 повтора, 7 000 строк. Константа = среднее train, как в sample_submission. Все предсказания клипнуты снизу на 350.</div>
+      <div class="bars">
+        <div class="bar-row best"><div class="bar-label">Лог-линейная по районам, куб. по log(area)</div><div class="bar-track"><div class="bar-fill" style="width:41.3%"></div><div class="bar-val">1 266</div></div></div>
+        <div class="bar-row"><div class="bar-label">То же, квадратичная</div><div class="bar-track"><div class="bar-fill" style="width:41.8%"></div><div class="bar-val">1 283</div></div></div>
+        <div class="bar-row"><div class="bar-label">То же, линейная</div><div class="bar-track"><div class="bar-fill" style="width:43.3%"></div><div class="bar-val">1 328</div></div></div>
+        <div class="bar-row"><div class="bar-label">Random Forest</div><div class="bar-track"><div class="bar-fill" style="width:45.4%"></div><div class="bar-val">1 392</div></div></div>
+        <div class="bar-row"><div class="bar-label">LightGBM по log-таргету</div><div class="bar-track"><div class="bar-fill" style="width:45.7%"></div><div class="bar-val">1 400</div></div></div>
+        <div class="bar-row"><div class="bar-label">LightGBM по сырому таргету</div><div class="bar-track"><div class="bar-fill" style="width:47.1%"></div><div class="bar-val">1 444</div></div></div>
+        <div class="bar-row"><div class="bar-label">Ridge на one-hot, без взаимодействий</div><div class="bar-track"><div class="bar-fill" style="width:53.6%"></div><div class="bar-val">1 642</div></div></div>
+        <div class="bar-row"><div class="bar-label">Медиана по району</div><div class="bar-track"><div class="bar-fill" style="width:60.0%"></div><div class="bar-val">1 838</div></div></div>
+        <div class="bar-row"><div class="bar-label">Константа (sample_submission)</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div><div class="bar-val">3 066</div></div></div>
+      </div>
+      <div class="axis"><div class="axis-unit">RMSE, у.е./мес</div><div class="axis-scale"><span>0</span><span>1 000</span><span>2 000</span><span>3 070</span></div></div>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Модель</th><th class="num">RMSE</th><th class="num">MAE</th><th class="num">R²</th><th class="num">MAPE</th></tr></thead>
+        <tbody>
+          <tr class="hl"><td>Лог-линейная по районам, deg 3</td><td class="num">1 266</td><td class="num">795</td><td class="num">0.827</td><td class="num">32.5 %</td></tr>
+          <tr><td>Она же, предсказание медианы</td><td class="num">1 275</td><td class="num">780</td><td class="num">0.826</td><td class="num">30.3 %</td></tr>
+          <tr><td>Лог-линейная, deg 2</td><td class="num">1 283</td><td class="num">797</td><td class="num">0.824</td><td class="num">32.6 %</td></tr>
+          <tr><td>Blend 0.6 × линейная + 0.4 × LGBM</td><td class="num">1 286</td><td class="num">782</td><td class="num">0.823</td><td class="num">31.3 %</td></tr>
+          <tr><td>Random Forest</td><td class="num">1 392</td><td class="num">811</td><td class="num">0.793</td><td class="num">32.9 %</td></tr>
+          <tr><td>LightGBM по log-таргету</td><td class="num">1 400</td><td class="num">801</td><td class="num">0.792</td><td class="num">30.5 %</td></tr>
+          <tr><td>Константа из sample_submission</td><td class="num">3 066</td><td class="num">1 510</td><td class="num">0.000</td><td class="num">64.2 %</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Все предсказания клипнуты снизу на 350.</p>
+  </div>
+
+  <div class="col stack" style="margin-top:26px">
+    <div class="note crit">
+      <span class="tag">Контринтуитивный результат</span>
+      <p>Градиентный бустинг здесь <strong>проигрывает</strong> линейной модели примерно 10 % RMSE. Причина в том, что настоящая зависимость гладкая и параметрическая, а шум огромный: деревья тратят ёмкость на аппроксимацию гладких кривых ступеньками и попутно запоминают шум. Не начинайте с CatBoost «потому что табличка» — это ловушка именно этой задачи, и на ней сложится большинство участников.</p>
+    </div>
+    <div class="note warn">
+      <span class="tag">Подгонка под метрику</span>
+      <p>Модель обучается в логарифмах, а сдавать нужно цену. При обратном переходе выбор важен: <code class="mono">exp(μ)</code> — это <em>медиана</em>, а <code class="mono">exp(μ + σ²/2)</code> — <em>среднее</em>. Для RMSE и R² нужно среднее, для MAE и MAPE — медиана. Разница около 15 пунктов MAE и 10 пунктов RMSE: бесплатные баллы, если знать метрику лидерборда.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Идеи реализации — три уровня</h2></div>
+  <div class="cards">
+    <div class="card">
+      <span class="chip">30 минут</span>
+      <h3>Уровень 0 — рабочий сабмит</h3>
+      <p>Прочитать CSV, one-hot по району, <code class="mono">log(rent_price)</code> как таргет, Ridge с явными произведениями <em>район × log(area)</em> и <em>район × distance</em>. Клип на 350, экспонента обратно. R² ≈ 0.80.</p>
+      <p>Смысл — сразу занять место на лидерборде и увидеть, совпадает ли ваша локальная валидация с публичной оценкой.</p>
+    </div>
+    <div class="card">
+      <span class="chip">1 день</span>
+      <h3>Уровень 1 — основное решение</h3>
+      <p>Блочная лог-линейная модель: у каждого района свои свободный член, полином 2–3 степени по <code class="mono">log(area)</code>, коэффициент при <code class="mono">distance</code> и при <code class="mono">log1p(floor)</code>. Итого ~50 параметров, обучается за миллисекунды.</p>
+      <p>Плюс поправка на логнормальность под метрику соревнования и лёгкий блендинг с LightGBM (вес 0.2–0.4), если публичный лидерборд его любит.</p>
+    </div>
+    <div class="card">
+      <span class="chip warn">2–4 дня</span>
+      <h3>Уровень 2 — то, за что дают баллы жюри</h3>
+      <p>Само качество упирается в потолок, поэтому дальше выигрывает <em>объяснение</em>: показать, что данные синтетические, восстановить формулу, привести таблицу коэффициентов, оценить долю необъяснимой дисперсии.</p>
+      <p>Сюда же — интервальные предсказания (квантильная регрессия по районам), проверка устойчивости, аккуратный ноутбук с выводами на человеческом языке.</p>
+    </div>
+  </div>
+
+  <div class="col stack" style="margin-top:26px">
+    <h3>Что стоит попробовать сверх этого</h3>
+    <ul class="tight">
+      <li><strong>Взвешенная регрессия.</strong> σ шума различается по районам втрое (0.23 у <span class="mono">luxury_hills</span> против 0.51 у <span class="mono">industrial</span>). Взвешивание наблюдений на 1/σ² района — корректный GLS и должно дать небольшой, но честный прирост.</li>
+      <li><strong>Усадка коэффициентов.</strong> У <span class="mono">luxury_hills</span> всего 270 наблюдений, а полином 3-й степени — это 6 параметров на район. Иерархическая модель (частичный пулинг к общему среднему) снизит дисперсию оценок на малых районах.</li>
+      <li><strong>Tobit-поправка на обрезку.</strong> 36 наблюдений с ценой ровно 350 — это цензурированные снизу данные. Формально их надо учитывать цензурированным правдоподобием, а не как обычные точки. Эффект крошечный (0.5 % выборки), но в отчёте смотрится сильно.</li>
+      <li><strong>Что <em>не</em> тратить время.</strong> Нейросети — на 7 000 строк и 4 признака они не дадут ничего сверх линейной модели. Автоматический feature engineering, стекинг из десяти моделей, AutoML — весь прирост уже съеден потолком шума.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">06</span><h2>Сложности и риски</h2></div>
+  <div class="stack">
+    <div class="tw">
+      <table>
+        <thead><tr><th>Что может пойти не так</th><th>Насколько вероятно</th><th>Что делать</th></tr></thead>
+        <tbody>
+          <tr><td class="wrap-cell" style="min-width:220px">Начать с бустинга и застрять на R² ≈ 0.79</td><td><span class="chip crit">высоко</span></td><td class="wrap-cell">Первым делом построить лог-линейную модель со взаимодействиями и сравнить по одинаковой CV</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Неизвестна метрика лидерборда</td><td><span class="chip crit">высоко</span></td><td class="wrap-cell">Уточнить на платформе. От неё зависит выбор среднее/медиана и целесообразность лог-таргета</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Тяжёлый хвост таргета ломает валидацию</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">Одна квартира за 66 217 может сдвинуть RMSE фолда. Использовать повторную CV и смотреть на разброс между повторами, а не на одно число</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Переобучение на публичный лидерборд</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">При σ шума 0.37 на 2 000 объектах шум оценки заметен. Доверять локальной CV, а не улучшению на третьем знаке публичной метрики</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Малый район <span class="mono">luxury_hills</span> с высокой ценой</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">270 объектов, но именно там самые дорогие квартиры и самый большой вклад в RMSE. Проверить его отдельно</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Файлы без расширений не читаются</td><td><span class="chip">низко</span></td><td class="wrap-cell">Это CSV. Переименовать или читать как есть</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">07</span><h2>План по времени</h2></div>
+  <div class="col stack">
+    <p>До закрытия квалификации 15 сентября остаётся около 3,5 недель. Самой задаче нужно 3–5 рабочих дней; остальное — запас на две другие темы и оформление.</p>
+  </div>
+  <div class="col" style="margin-top:22px">
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-when">День 1 · 2–3 часа</div>
+        <h3>Разведка и первый сабмит</h3>
+        <p>Прочитать данные, повторить EDA из раздела 02, отправить константу и Ridge-baseline. Зафиксировать схему валидации и убедиться, что локальная метрика ведёт себя как публичная.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">День 2 · 4–5 часов</div>
+        <h3>Основная модель</h3>
+        <p>Блочная лог-линейная регрессия, подбор степени полинома по CV, поправка на логнормальность, клип. Здесь набирается ~95 % итогового качества.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">День 3 · 3–4 часа</div>
+        <h3>Контроль и добор</h3>
+        <p>Сравнение с LightGBM и CatBoost на той же CV, взвешивание по σ района, усадка коэффициентов, эксперимент с блендом. Решение, что оставить в финале.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Дни 4–5 · 5–6 часов</div>
+        <h3>Отчёт и оформление</h3>
+        <p>Чистый ноутбук: разбор структуры данных, таблица коэффициентов с интерпретацией, оценка потолка качества, честный вывод о том, почему бустинг проигрывает. Это то, что отличает решение уровня «сдал» от решения уровня «запомнили».</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">Резерв</div>
+        <h3>Две оставшиеся темы</h3>
+        <p>Задача аренды закрывается за неделю с запасом. Оставшиеся ~2,5 недели логично отдать другим двум темам квалификации.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">08</span><h2>Ресурсы</h2></div>
+  <div class="col">
+    <div class="kv">
+      <div class="kv-row">
+        <div class="kv-k">Железо</div>
+        <div class="kv-v">Любой ноутбук. Данные — 250 КБ, вся выборка занимает ~2 МБ в памяти. Полная кросс-валидация лог-линейной модели считается за секунды, LightGBM на 20 фолдах — за минуту. <strong>GPU не нужен вообще</strong>, 8 ГБ ОЗУ более чем достаточно. Kaggle Notebooks или Colab на бесплатном тарифе покрывают всё с многократным запасом.</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-k">Обязательный софт</div>
+        <div class="kv-v">Python 3.10+, <span class="mono">numpy</span>, <span class="mono">pandas</span>, <span class="mono">scikit-learn</span>. Этого достаточно для решения целиком — итоговая модель это <span class="mono">np.linalg.lstsq</span>.</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-k">Желательно</div>
+        <div class="kv-v"><span class="mono">matplotlib</span> или <span class="mono">seaborn</span> для графиков в отчёте, <span class="mono">lightgbm</span> и <span class="mono">catboost</span> для сравнения (чтобы в отчёте было чем подкрепить вывод), <span class="mono">statsmodels</span> для доверительных интервалов коэффициентов.</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-k">Среда</div>
+        <div class="kv-v">Jupyter или VS Code. Один ноутбук на всю задачу — так проще собрать отчёт. Git не обязателен, но полезен, если работаете командой.</div>
+      </div>
+      <div class="kv-row">
+        <div class="kv-k">Установка</div>
+        <div class="kv-v"><span class="mono">pip install numpy pandas scikit-learn matplotlib lightgbm catboost statsmodels</span> — около двух минут.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">09</span><h2>Что уточнить на платформе перед стартом</h2></div>
+  <div class="col stack">
+    <ul class="tight">
+      <li><strong>Метрика лидерборда</strong> — RMSE, MAE, MAPE или R². От этого напрямую зависит, предсказывать среднее или медиану, и стоит ли вообще логарифмировать таргет.</li>
+      <li><strong>Лимит сабмитов в сутки</strong> — определяет, можно ли пробовать варианты на публичном лидерборде или всё придётся решать локальной валидацией.</li>
+      <li><strong>Требуется ли ноутбук с решением</strong> помимо CSV, и оценивается ли он отдельно. Если да, уровень 2 из раздела 05 становится обязательным, а не бонусным.</li>
+      <li><strong>Есть ли ограничение на библиотеки или время исполнения</strong> — для этой задачи не критично, но проверить стоит.</li>
+      <li><strong>Правила про командную работу и внешние данные</strong> — стандартная формальность, но лучше прочитать до, а не после.</li>
+    </ul>
+    <div class="note">
+      <span class="tag">Готово к запуску</span>
+      <p>В папке проекта уже лежат <code class="mono">solution_baseline.py</code> и два готовых сабмита: <code class="mono">submission_rmse.csv</code> (предсказание среднего, под RMSE и R²) и <code class="mono">submission_mae.csv</code> (предсказание медианы, под MAE и MAPE). Скрипт печатает полную кросс-валидацию и пересобирает оба файла за несколько секунд.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Все числа получены на данных из папки проекта: кросс-валидация 5 фолдов × 4 повтора, seed 7. Сведения о конкурсе — из открытых источников:</p>
+  <ul>
+    <li><a href="https://aiijc.com/ru/">aiijc.com — официальный сайт AI Challenge</a></li>
+    <li><a href="https://lenta.ru/news/2026/05/26/nachalsya-konkurs-po-ii-dlya-detey-i-molodezhi-ai-challenge/">Lenta.ru — сроки и треки AI Challenge 2026</a></li>
+    <li><a href="https://vsekonkursy.ru/konkurs-po-ii-dlya-detej-i-molodyozhi-ai-challenge-2025.html">vsekonkursy.ru — формат этапов и призовой фонд</a></li>
+  </ul>
+</footer>
+
+</div>
+</body></html>
