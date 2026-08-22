@@ -1,0 +1,12 @@
+**/data/train
+**/data/test
+**/data/sample_submission
+**/data/*.csv
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.DS_Store
