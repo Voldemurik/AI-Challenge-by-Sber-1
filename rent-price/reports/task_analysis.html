@@ -146,6 +146,42 @@ tr.hl td{background:var(--accent-soft); font-weight:600;}
 .axis-scale{border-top:1px solid var(--line-strong); padding-top:5px; display:flex; justify-content:space-between;}
 .axis-unit{text-align:right; padding-top:5px;}
 
+/* ---------- dot plot ---------- */
+.dots{display:flex; flex-direction:column; gap:9px; position:relative;}
+.dot-row{display:grid; grid-template-columns:215px 1fr 52px; gap:14px; align-items:center;}
+.dot-label{font-size:.85rem; color:var(--ink-2); text-align:right; line-height:1.25;}
+.dot-track{position:relative; height:20px;}
+.dot-track::before{
+  content:""; position:absolute; left:0; right:0; top:9px; height:1px; background:var(--line);
+}
+.dot{
+  position:absolute; top:4px; width:12px; height:12px; border-radius:50%; margin-left:-6px;
+  background:var(--accent); opacity:.45; border:2px solid var(--surface); box-sizing:content-box;
+  transition:opacity .15s ease;
+}
+.dot-row:hover .dot{opacity:.9}
+.dot-row.best .dot{opacity:1}
+.floor-line{
+  position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--crit); opacity:.6;
+  pointer-events:none; z-index:0;
+  left:calc(229px + (100% - 295px) * 0.073);
+}
+.dot{z-index:1}
+.dot-val{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:.84rem; font-weight:600; color:var(--ink); min-width:52px; text-align:right;
+}
+.dot-axis{
+  display:grid; grid-template-columns:215px 1fr 52px; gap:14px;
+  margin-top:10px; font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--muted);
+}
+.dot-axis .scale{display:flex; justify-content:space-between; border-top:1px solid var(--line-strong); padding-top:5px;}
+.dot-axis .unit{text-align:right; padding-top:5px;}
+.legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; font-size:.8rem; color:var(--muted);}
+.legend span{display:inline-flex; align-items:center; gap:7px;}
+.legend i{width:11px; height:11px; border-radius:50%; background:var(--accent); display:inline-block;}
+.legend i.line{width:2px; height:13px; border-radius:0; background:var(--crit); opacity:.55;}
+
 /* ---------- cards ---------- */
 .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:14px;}
 .card{border:1px solid var(--line); background:var(--surface); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:9px;}
@@ -205,6 +241,9 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
 :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 @media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important}}
 @media (max-width:620px){
+  .dot-row, .dot-axis{grid-template-columns:1fr 2fr 48px; gap:8px}
+  .dot-label{font-size:.78rem}
+  .floor-line{display:none}
   .bar-row{grid-template-columns:1fr; gap:4px}
   .bar-label{text-align:left}
   .kv-row{grid-template-columns:1fr; gap:2px}
@@ -215,12 +254,12 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
   <div class="wrap">
     <div class="eyebrow">AI Challenge 2026 · квалификационный этап</div>
     <h1>Стоимость аренды квартиры: разбор задачи и план работы</h1>
-    <p class="lede">Табличная регрессия на 7 000 строках и четырёх признаках. Разбор показал, что данные синтетические и порождены компактной мультипликативной формулой — поэтому здесь выигрывает не бустинг, а модель из полусотни коэффициентов.</p>
+    <p class="lede">Табличная регрессия на 7 000 строках и четырёх признаках. Разбор показал, что данные синтетические и порождены компактной мультипликативной формулой — поэтому здесь выигрывает не бустинг, а модель из полусотни коэффициентов, настроенная точно под метрику соревнования.</p>
     <dl class="spec">
       <div><dt>train</dt><dd>7 000<small>строк, 4 признака</small></dd></div>
       <div><dt>test</dt><dd>2 000<small>строк, id 7000–8999</small></dd></div>
-      <div><dt>Пропуски</dt><dd>0<small>и дублей тоже нет</small></dd></div>
-      <div><dt>Потолок R²</dt><dd>≈0.83<small>дальше только шум</small></dd></div>
+      <div><dt>Метрика</dt><dd>MAE<small>1 − MAE/1500</small></dd></div>
+      <div><dt>MAE</dt><dd>773.5<small>балл 0.484</small></dd></div>
       <div><dt>Дедлайн</dt><dd>15.09<small>≈3,5 недели</small></dd></div>
     </dl>
   </div>
@@ -298,7 +337,7 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
     </div>
     <div class="note warn">
       <span class="tag">Вывод 2 — потолок</span>
-      <p>Разброс остатков в логарифмах σ ≈ 0.37, то есть мультипликативный шум порядка ±40 %. Он и определяет предел: <strong>выше R² ≈ 0.83 подняться нельзя никакой моделью</strong>. Разница между хорошим и отличным решением здесь — доли процента, а не разы. Планируйте время исходя из этого и не устраивайте недельный подбор гиперпараметров.</p>
+      <p>Разброс остатков в логарифмах σ ≈ 0.37, то есть мультипликативный шум порядка ±44 %. Он и определяет предел. Модель, знающая истинную формулу наизусть, всё равно получила бы <strong>MAE ≈ 754</strong> — это неустранимый минимум. Текущее решение даёт 773.5, то есть до предела остаётся 20 единиц MAE, или <strong>0.013 балла</strong>. Разница между хорошим и отличным решением здесь — тысячные доли балла, а не разы. Планируйте время исходя из этого и не устраивайте недельный подбор гиперпараметров.</p>
     </div>
     <div class="note">
       <span class="tag">Вывод 3 — обрезка</span>
@@ -310,51 +349,61 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
 <section>
   <div class="sec-head"><span class="num">04</span><h2>Бенчмарк: что реально работает</h2></div>
   <div class="col stack">
-    <p>Ниже — честная кросс-валидация 5 фолдов × 4 повтора на train. Один и тот же протокол для всех моделей, метрики считаются на исходной шкале цены.</p>
+    <p>Честная кросс-валидация 5 фолдов × 4 повтора на train, один протокол для всех моделей. Метрика — MAE, как в соревновании.</p>
   </div>
   <div class="stack" style="margin-top:18px">
     <div class="chart">
-      <div class="chart-title">RMSE на кросс-валидации — меньше значит лучше</div>
-      <div class="chart-sub">5-fold × 4 повтора, 7 000 строк. Константа = среднее train, как в sample_submission. Все предсказания клипнуты снизу на 350.</div>
-      <div class="bars">
-        <div class="bar-row best"><div class="bar-label">Лог-линейная по районам, куб. по log(area)</div><div class="bar-track"><div class="bar-fill" style="width:41.3%"></div><div class="bar-val">1 266</div></div></div>
-        <div class="bar-row"><div class="bar-label">То же, квадратичная</div><div class="bar-track"><div class="bar-fill" style="width:41.8%"></div><div class="bar-val">1 283</div></div></div>
-        <div class="bar-row"><div class="bar-label">То же, линейная</div><div class="bar-track"><div class="bar-fill" style="width:43.3%"></div><div class="bar-val">1 328</div></div></div>
-        <div class="bar-row"><div class="bar-label">Random Forest</div><div class="bar-track"><div class="bar-fill" style="width:45.4%"></div><div class="bar-val">1 392</div></div></div>
-        <div class="bar-row"><div class="bar-label">LightGBM по log-таргету</div><div class="bar-track"><div class="bar-fill" style="width:45.7%"></div><div class="bar-val">1 400</div></div></div>
-        <div class="bar-row"><div class="bar-label">LightGBM по сырому таргету</div><div class="bar-track"><div class="bar-fill" style="width:47.1%"></div><div class="bar-val">1 444</div></div></div>
-        <div class="bar-row"><div class="bar-label">Ridge на one-hot, без взаимодействий</div><div class="bar-track"><div class="bar-fill" style="width:53.6%"></div><div class="bar-val">1 642</div></div></div>
-        <div class="bar-row"><div class="bar-label">Медиана по району</div><div class="bar-track"><div class="bar-fill" style="width:60.0%"></div><div class="bar-val">1 838</div></div></div>
-        <div class="bar-row"><div class="bar-label">Константа (sample_submission)</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div><div class="bar-val">3 066</div></div></div>
+      <div class="chart-title">MAE на кросс-валидации — левее значит лучше</div>
+      <div class="chart-sub">Все разумные модели умещаются в 130 единиц над неустранимым минимумом. Константный baseline организаторов даёт 1510 и в шкалу не помещается.</div>
+      <div class="dots">
+        <div class="floor-line"></div>
+        <div class="dot-row best"><div class="dot-label">Медианная регрессия deg 3 + бустинг 0.15</div><div class="dot-track"><div class="dot" style="left:17.6%"></div></div><div class="dot-val">773.5</div></div>
+        <div class="dot-row"><div class="dot-label">Медианная регрессия deg 3</div><div class="dot-track"><div class="dot" style="left:18.7%"></div></div><div class="dot-val">775.5</div></div>
+        <div class="dot-row"><div class="dot-label">МНК в логах + медиана, deg 3</div><div class="dot-track"><div class="dot" style="left:21.2%"></div></div><div class="dot-val">780.3</div></div>
+        <div class="dot-row"><div class="dot-label">МНК в логах, deg 3 — условное среднее</div><div class="dot-track"><div class="dot" style="left:29.1%"></div></div><div class="dot-val">795.2</div></div>
+        <div class="dot-row"><div class="dot-label">LightGBM по log-таргету</div><div class="dot-track"><div class="dot" style="left:34.9%"></div></div><div class="dot-val">806.4</div></div>
+        <div class="dot-row"><div class="dot-label">Random Forest</div><div class="dot-track"><div class="dot" style="left:37.2%"></div></div><div class="dot-val">810.6</div></div>
+        <div class="dot-row"><div class="dot-label">Ridge на one-hot, log(цена)</div><div class="dot-track"><div class="dot" style="left:56.9%"></div></div><div class="dot-val">848.1</div></div>
+        <div class="dot-row"><div class="dot-label">Медиана по району</div><div class="dot-track"><div class="dot" style="left:83.4%"></div></div><div class="dot-val">898.5</div></div>
       </div>
-      <div class="axis"><div class="axis-unit">RMSE, у.е./мес</div><div class="axis-scale"><span>0</span><span>1 000</span><span>2 000</span><span>3 070</span></div></div>
+      <div class="dot-axis"><div class="unit">MAE, у.е./мес</div><div class="scale"><span>740</span><span>800</span><span>860</span><span>930</span></div><div style="min-width:52px"></div></div>
+      <div class="legend">
+        <span><i></i>модель</span>
+        <span><i class="line"></i>неустранимый минимум — 754</span>
+      </div>
     </div>
 
     <div class="tw">
       <table>
-        <thead><tr><th>Модель</th><th class="num">RMSE</th><th class="num">MAE</th><th class="num">R²</th><th class="num">MAPE</th></tr></thead>
+        <thead><tr><th>Модель</th><th class="num">MAE</th><th class="num">Балл</th><th class="num">RMSE</th><th class="num">R²</th></tr></thead>
         <tbody>
-          <tr class="hl"><td>Лог-линейная по районам, deg 3</td><td class="num">1 266</td><td class="num">795</td><td class="num">0.827</td><td class="num">32.5 %</td></tr>
-          <tr><td>Она же, предсказание медианы</td><td class="num">1 275</td><td class="num">780</td><td class="num">0.826</td><td class="num">30.3 %</td></tr>
-          <tr><td>Лог-линейная, deg 2</td><td class="num">1 283</td><td class="num">797</td><td class="num">0.824</td><td class="num">32.6 %</td></tr>
-          <tr><td>Blend 0.6 × линейная + 0.4 × LGBM</td><td class="num">1 286</td><td class="num">782</td><td class="num">0.823</td><td class="num">31.3 %</td></tr>
-          <tr><td>Random Forest</td><td class="num">1 392</td><td class="num">811</td><td class="num">0.793</td><td class="num">32.9 %</td></tr>
-          <tr><td>LightGBM по log-таргету</td><td class="num">1 400</td><td class="num">801</td><td class="num">0.792</td><td class="num">30.5 %</td></tr>
-          <tr><td>Константа из sample_submission</td><td class="num">3 066</td><td class="num">1 510</td><td class="num">0.000</td><td class="num">64.2 %</td></tr>
+          <tr class="hl"><td>Медианная регрессия deg 3 + бустинг 0.15</td><td class="num">773.5</td><td class="num">0.484</td><td class="num">1 280</td><td class="num">0.825</td></tr>
+          <tr><td>Медианная регрессия deg 3</td><td class="num">775.5</td><td class="num">0.483</td><td class="num">1 275</td><td class="num">0.826</td></tr>
+          <tr><td>МНК в логах + медиана, deg 3</td><td class="num">780.3</td><td class="num">0.480</td><td class="num">1 275</td><td class="num">0.826</td></tr>
+          <tr><td>МНК в логах, deg 3 — условное среднее</td><td class="num">795.2</td><td class="num">0.470</td><td class="num">1 266</td><td class="num">0.827</td></tr>
+          <tr><td>LightGBM по log-таргету</td><td class="num">806.4</td><td class="num">0.462</td><td class="num">1 405</td><td class="num">0.790</td></tr>
+          <tr><td>Random Forest</td><td class="num">810.6</td><td class="num">0.460</td><td class="num">1 392</td><td class="num">0.793</td></tr>
+          <tr><td>Медиана по району</td><td class="num">898.5</td><td class="num">0.401</td><td class="num">1 838</td><td class="num">0.643</td></tr>
+          <tr><td>Константа из sample_submission</td><td class="num">1 509.8</td><td class="num">0.008</td><td class="num">3 066</td><td class="num">0.000</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Все предсказания клипнуты снизу на 350.</p>
+    <p class="caption">Балл считается как max(0, 1 − MAE / 1500). Все предсказания клипнуты снизу на 350.</p>
   </div>
 
   <div class="col stack" style="margin-top:26px">
     <div class="note crit">
       <span class="tag">Контринтуитивный результат</span>
-      <p>Градиентный бустинг здесь <strong>проигрывает</strong> линейной модели примерно 10 % RMSE. Причина в том, что настоящая зависимость гладкая и параметрическая, а шум огромный: деревья тратят ёмкость на аппроксимацию гладких кривых ступеньками и попутно запоминают шум. Не начинайте с CatBoost «потому что табличка» — это ловушка именно этой задачи, и на ней сложится большинство участников.</p>
+      <p>Градиентный бустинг здесь <strong>проигрывает</strong> линейной модели. Причина в том, что настоящая зависимость гладкая и параметрическая, а шум огромный: деревья тратят ёмкость на аппроксимацию плавных кривых ступеньками и попутно запоминают шум. Не начинайте с CatBoost «потому что табличка» — это ловушка именно этой задачи, и на ней сложится большинство участников.</p>
     </div>
-    <div class="note warn">
-      <span class="tag">Подгонка под метрику</span>
-      <p>Модель обучается в логарифмах, а сдавать нужно цену. При обратном переходе выбор важен: <code class="mono">exp(μ)</code> — это <em>медиана</em>, а <code class="mono">exp(μ + σ²/2)</code> — <em>среднее</em>. Для RMSE и R² нужно среднее, для MAE и MAPE — медиана. Разница около 15 пунктов MAE и 10 пунктов RMSE: бесплатные баллы, если знать метрику лидерборда.</p>
+    <div class="note">
+      <span class="tag">Подгонка под метрику дала больше, чем выбор модели</span>
+      <p>MAE минимизируется <em>условной медианой</em>, а не средним. Модель живёт в логарифмах и выдаёт оценку μ: <code class="mono">exp(μ)</code> — это медиана цены, <code class="mono">exp(μ + σ²/2)</code> — среднее. Двух шагов в сторону медианы хватило, чтобы снять 22 единицы MAE:</p>
+      <ul class="tight">
+        <li><strong>Убрать поправку σ²/2</strong> — минус 15 единиц. Одна строка кода.</li>
+        <li><strong>Заменить МНК медианной регрессией</strong> — ещё минус 5. МНК оценивает <em>среднее</em> логарифма цены, а нам нужна <em>медиана</em>; для симметричного шума это одно и то же, но остатки скошены влево (асимметрия −0.77) из-за обрезки цены снизу. Парный t-тест по 20 фолдам: p = 5.9·10⁻⁴, то есть выигрыш не случайный.</li>
+      </ul>
+      <p>Плюс 15 % LightGBM с потерей <code class="mono">l1</code> в смеси — ещё 2 единицы. Итого 795 → 773.5, или +0.014 балла.</p>
     </div>
   </div>
 </section>
@@ -371,14 +420,14 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
     <div class="card">
       <span class="chip">1 день</span>
       <h3>Уровень 1 — основное решение</h3>
-      <p>Блочная лог-линейная модель: у каждого района свои свободный член, полином 2–3 степени по <code class="mono">log(area)</code>, коэффициент при <code class="mono">distance</code> и при <code class="mono">log1p(floor)</code>. Итого ~50 параметров, обучается за миллисекунды.</p>
-      <p>Плюс поправка на логнормальность под метрику соревнования и лёгкий блендинг с LightGBM (вес 0.2–0.4), если публичный лидерборд его любит.</p>
+      <p>Блочная лог-линейная модель: у каждого района свои свободный член, полином 2–3 степени по <code class="mono">log(area)</code>, коэффициент при <code class="mono">distance</code> и при <code class="mono">log1p(floor)</code>. Итого 60 параметров, обучается за миллисекунды.</p>
+      <p>Подгонка коэффициентов — медианной регрессией, раз метрика MAE, и обратное преобразование без поправки σ²/2. Плюс 15 % LightGBM с потерей <code class="mono">l1</code> в смеси.</p>
     </div>
     <div class="card">
       <span class="chip warn">2–4 дня</span>
       <h3>Уровень 2 — то, за что дают баллы жюри</h3>
       <p>Само качество упирается в потолок, поэтому дальше выигрывает <em>объяснение</em>: показать, что данные синтетические, восстановить формулу, привести таблицу коэффициентов, оценить долю необъяснимой дисперсии.</p>
-      <p>Сюда же — интервальные предсказания (квантильная регрессия по районам), проверка устойчивости, аккуратный ноутбук с выводами на человеческом языке.</p>
+      <p>Сюда же — расчёт неустранимого минимума MAE (то есть доказательство, что дальше улучшать нечего), парные тесты значимости улучшений, аккуратный ноутбук с выводами на человеческом языке.</p>
     </div>
   </div>
 
@@ -401,8 +450,8 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
         <thead><tr><th>Что может пойти не так</th><th>Насколько вероятно</th><th>Что делать</th></tr></thead>
         <tbody>
           <tr><td class="wrap-cell" style="min-width:220px">Начать с бустинга и застрять на R² ≈ 0.79</td><td><span class="chip crit">высоко</span></td><td class="wrap-cell">Первым делом построить лог-линейную модель со взаимодействиями и сравнить по одинаковой CV</td></tr>
-          <tr><td class="wrap-cell" style="min-width:220px">Неизвестна метрика лидерборда</td><td><span class="chip crit">высоко</span></td><td class="wrap-cell">Уточнить на платформе. От неё зависит выбор среднее/медиана и целесообразность лог-таргета</td></tr>
-          <tr><td class="wrap-cell" style="min-width:220px">Тяжёлый хвост таргета ломает валидацию</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">Одна квартира за 66 217 может сдвинуть RMSE фолда. Использовать повторную CV и смотреть на разброс между повторами, а не на одно число</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Проигнорировать метрику и оптимизировать «вообще»</td><td><span class="chip crit">высоко</span></td><td class="wrap-cell">Метрика — MAE, а значит нужна условная медиана, а не среднее. Здесь это стоило 22 единиц MAE — больше, чем разница между линейной моделью и бустингом</td></tr>
+          <tr><td class="wrap-cell" style="min-width:220px">Тяжёлый хвост таргета ломает валидацию</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">Одна квартира за 66 217 заметно двигает метрику фолда. Использовать повторную CV и сравнивать модели попарно по одним и тем же фолдам, а не по одному усреднённому числу</td></tr>
           <tr><td class="wrap-cell" style="min-width:220px">Переобучение на публичный лидерборд</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">При σ шума 0.37 на 2 000 объектах шум оценки заметен. Доверять локальной CV, а не улучшению на третьем знаке публичной метрики</td></tr>
           <tr><td class="wrap-cell" style="min-width:220px">Малый район <span class="mono">luxury_hills</span> с высокой ценой</td><td><span class="chip warn">средне</span></td><td class="wrap-cell">270 объектов, но именно там самые дорогие квартиры и самый большой вклад в RMSE. Проверить его отдельно</td></tr>
           <tr><td class="wrap-cell" style="min-width:220px">Файлы без расширений не читаются</td><td><span class="chip">низко</span></td><td class="wrap-cell">Это CSV. Переименовать или читать как есть</td></tr>
@@ -477,18 +526,23 @@ footer ul{margin:8px 0 0; padding-left:1.1em; display:flex; flex-direction:colum
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">09</span><h2>Что уточнить на платформе перед стартом</h2></div>
+  <div class="sec-head"><span class="num">09</span><h2>Что осталось</h2></div>
   <div class="col stack">
+    <div class="note">
+      <span class="tag">Метрика известна</span>
+      <p>Организаторы оценивают по <strong>MAE</strong>, балл считается как <code class="mono">max(0, 1 − MAE / 1500)</code>. При MAE выше 1500 участник получает ноль и не проходит этап. Константный baseline организаторов даёт 1510 — то есть почти ровно ноль, и всё, что мы выигрываем, идёт прямо в зачёт.</p>
+      <p>Модель настроена под эту метрику: ожидаемый балл <strong>≈ 0.484</strong>, у идеальной модели было бы ≈ 0.497.</p>
+    </div>
+    <p><strong>На проверку отправляется <code class="mono">rent-price/submissions/submission_mae.csv</code></strong> — предсказание условной медианы. Файл <code class="mono">submission_rmse.csv</code> остаётся в репозитории как запасной, на случай если метрика где-то окажется другой.</p>
+    <h3 style="margin-top:8px">Что стоит проверить на платформе</h3>
     <ul class="tight">
-      <li><strong>Метрика лидерборда</strong> — RMSE, MAE, MAPE или R². От этого напрямую зависит, предсказывать среднее или медиану, и стоит ли вообще логарифмировать таргет.</li>
-      <li><strong>Лимит сабмитов в сутки</strong> — определяет, можно ли пробовать варианты на публичном лидерборде или всё придётся решать локальной валидацией.</li>
-      <li><strong>Требуется ли ноутбук с решением</strong> помимо CSV, и оценивается ли он отдельно. Если да, уровень 2 из раздела 05 становится обязательным, а не бонусным.</li>
-      <li><strong>Есть ли ограничение на библиотеки или время исполнения</strong> — для этой задачи не критично, но проверить стоит.</li>
-      <li><strong>Правила про командную работу и внешние данные</strong> — стандартная формальность, но лучше прочитать до, а не после.</li>
+      <li><strong>Требуется ли что-то помимо CSV</strong> — ноутбук, отчёт, ссылка на репозиторий. Если да, всё это уже готово.</li>
+      <li><strong>Лимит попыток в сутки</strong> — определяет, можно ли сверять варианты на публичном лидерборде.</li>
+      <li><strong>Можно ли держать решение в открытом репозитории</strong> до конца этапа. Если нельзя — переключить на приватный, это одна кнопка.</li>
     </ul>
     <div class="note">
-      <span class="tag">Готово к запуску</span>
-      <p>В папке проекта уже лежат <code class="mono">solution_baseline.py</code> и два готовых сабмита: <code class="mono">submission_rmse.csv</code> (предсказание среднего, под RMSE и R²) и <code class="mono">submission_mae.csv</code> (предсказание медианы, под MAE и MAPE). Скрипт печатает полную кросс-валидацию и пересобирает оба файла за несколько секунд.</p>
+      <span class="tag">Что уже сделано</span>
+      <p>Репозиторий <a href="https://github.com/Voldemurik/AI-Challenge-by-Sber-1"><code class="mono">AI-Challenge-by-Sber-1</code></a> содержит модель, ноутбук с полным разбором, отчёты в HTML и оба сабмита. Одна команда <code class="mono">python scripts/make_submission.py</code> пересобирает всё с нуля и печатает кросс-валидацию с баллами.</p>
     </div>
   </div>
 </section>
